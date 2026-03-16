@@ -12,6 +12,7 @@ CONF_SUBSCRIPTION_NAME = "subscription_name"
 CONF_SUBSCRIBER_ID = "subscriber_id"  # Old format
 CONF_SUBSCRIBER_ID_IMPORTED = "subscriber_id_imported"
 CONF_CLOUD_PROJECT_ID = "cloud_project_id"
+CONF_FAN_DURATION_BY_DEVICE = "fan_duration_by_device"
 
 CONNECTIVITY_TRAIT_OFFLINE = "OFFLINE"
 
@@ -27,3 +28,6 @@ SDM_SCOPES = [
     "https://www.googleapis.com/auth/pubsub",
 ]
 API_URL = "https://smartdevicemanagement.googleapis.com/v1"
+
+MAX_FAN_DURATION = 43200
+DEFAULT_FAN_DURATION = MAX_FAN_DURATION

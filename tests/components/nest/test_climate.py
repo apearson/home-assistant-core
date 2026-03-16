@@ -1085,6 +1085,51 @@ async def test_thermostat_set_fan(
     }
 
 
+async def test_thermostat_set_fan_custom_duration_from_options(
+    hass: HomeAssistant,
+    setup_platform: PlatformSetup,
+    auth: FakeAuth,
+    create_device: CreateDevice,
+) -> None:
+    """Test fan timer duration override from config entry options."""
+    create_device.create(
+        {
+            "sdm.devices.traits.Fan": {
+                "timerMode": "OFF",
+                "timerTimeout": "2019-05-10T03:22:54Z",
+            },
+            "sdm.devices.traits.ThermostatHvac": {
+                "status": "OFF",
+            },
+            "sdm.devices.traits.ThermostatMode": {
+                "availableModes": ["HEAT", "COOL", "HEATCOOL", "OFF"],
+                "mode": "HEAT",
+            },
+        }
+    )
+    await setup_platform()
+
+    entry = hass.config_entries.async_entries("nest")[0]
+    hass.config_entries.async_update_entry(
+        entry,
+        options={"fan_duration_by_device": {DEVICE_ID: 901}},
+    )
+    assert entry.options == {"fan_duration_by_device": {DEVICE_ID: 901}}
+
+    await common.async_set_fan_mode(hass, FAN_ON)
+    await hass.async_block_till_done()
+
+    assert auth.method == "post"
+    assert auth.url == DEVICE_COMMAND
+    assert auth.json == {
+        "command": "sdm.devices.commands.Fan.SetTimer",
+        "params": {
+            "duration": "901s",
+            "timerMode": "ON",
+        },
+    }
+
+
 async def test_thermostat_set_fan_when_off(
     hass: HomeAssistant,
     setup_platform: PlatformSetup,
